@@ -140,7 +140,7 @@ function addAllListeners(element_name) {
 
     
     detect_swipe_events(document);
-    addAllListeners('div');
+    addAllListeners('li');
 
     
 });
