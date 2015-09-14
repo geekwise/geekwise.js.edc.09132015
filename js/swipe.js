@@ -1,31 +1,17 @@
 document.addEventListener('DOMContentLoaded',function(){
+function detect_swipe_events(element_to_detect) {
 
-//    //Returns the absolute value 
-//    var abs = Math.abs(-2.4);
-//    //Returns 2.4 not -2.4
-//    console.log(abs);
-//    
-//    //Returns the maximum number from values
-//    var max = Math.max(1,100);
-//    //Returns 100 because 100 > 1
-//    console.log(max);
-//    
-});
-
-
-
-document.addEventListener('DOMContentLoaded',function(){
-(function (D) {
-  var abs = Math.abs,
-      max = Math.max,
-      createEvent = function (e, eventType) {
-        var a = D.createEvent("CustomEvent");
-        a.initCustomEvent(eventType, true, true, e.target);
-        e.target.dispatchEvent(a);
+    var abs = Math.abs;
+    var max = Math.max;
+        
+    var createEvent = function (element, event_type) {
+        var a = element_to_detect.createEvent("CustomEvent");
+        a.initCustomEvent(event_type, true, true, element.target);
+        element.target.dispatchEvent(a);
         a = null;
         return 1;
       },
-      isMobile = (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent) ? 'touch' : 'mouse'),
+      isMobile = (/Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 'touch' : 'mouse'),
       moved = false,
       buttonDown = 0,
       pressedMoveThreshold = 20,
@@ -36,9 +22,9 @@ document.addEventListener('DOMContentLoaded',function(){
       calcEventType = function () {
         xdiff = abs(endx - startx);
         ydiff = abs(endy - starty);
-        var eventType = max(xdiff, ydiff) > pressedMoveThreshold ?
-            (xdiff > ydiff ? (startx > endx ? 'swl' : 'swr') : (starty > endy ? 'swu' : 'swd')) : 'fc';
-        return eventType;
+        var event_type = max(xdiff, ydiff) > pressedMoveThreshold ?
+            (xdiff > ydiff ? (startx > endx ? 'swipe_left' : 'swipe_right') : (starty > endy ? 'swipe_up' : 'swipe_down')) : 'swipe_double_tap';
+        return event_type;
       },
       f = {
         touch: {
@@ -46,7 +32,7 @@ document.addEventListener('DOMContentLoaded',function(){
             startx = e.touches[0].pageX;
             starty = e.touches[0].pageY;
             startdt = Date.now();
-            return createEvent(e, 'sfc');
+            return createEvent(e, 'swipe_tap');
           },
           touchmove: function (e) {
             moved = true;
@@ -57,7 +43,7 @@ document.addEventListener('DOMContentLoaded',function(){
           touchend: function (e) {
             endt = Date.now();
             if (!moved) {
-              return createEvent(e, 'fc');
+              return createEvent(e, 'swipe_double_tap');
             }
             moved = false;
             return createEvent(e, calcEventType());
@@ -77,7 +63,7 @@ document.addEventListener('DOMContentLoaded',function(){
             startx = e.clientX;
             starty = e.clientY;
             startdt = Date.now();
-            return createEvent(e, 'sfc');
+            return createEvent(e, 'swipe_tap');
           },
           mousemove: function (e) {
             if (!buttonDown) {
@@ -96,7 +82,7 @@ document.addEventListener('DOMContentLoaded',function(){
             }
             buttonDown = 0;
             if (!moved) {
-              return createEvent(e, 'fc');
+              return createEvent(e, 'swipe_double_tap');
             }
             moved = false;
             return createEvent(e, calcEventType());
@@ -104,34 +90,57 @@ document.addEventListener('DOMContentLoaded',function(){
         }
       };
   for (var eventName in f[isMobile]) {
-    D.addEventListener(eventName, f[isMobile][eventName], false);
+    element_to_detect.addEventListener(eventName, f[isMobile][eventName], false);
   }
-})(document)
+};
 
-function addAllListeners() {
-  function func(e) {
-    div.innerHTML = v[e.type];
+function addAllListeners(element_name) {
+    
+    
+  function swipe_action_to_element(swipe_event) {
+    element_to_detect_swipe.innerHTML = swipe_value[swipe_event.type];
   }
 
-  var div = document.getElementsByTagName('div')[0],
-      a = ['sfc', 'fc', 'swl', 'swr', 'swu', 'swd'],
-      b = a.length,
-      v = {
-        sfc: 'pressed', // superFastClick very bad name.
-        fc: 'fastClick',
-        swl: 'left',
-        swr: 'right',
-        swu: 'up',
-        swd: 'down'
+    
+  var element_to_detect_swipe = document.getElementsByTagName(element_name)[0];
+    
+    var  swipe_event_type = [
+          'swipe_tap',
+          'swipe_double_tap',
+          'swipe_left',
+          'swipe_right',
+          'swipe_up',
+          'swipe_down'
+        ];
+  
+      var swipe_types = swipe_event_type.length;
+  
+      var swipe_value = {
+        swipe_tap: 'press', // superFastClick very bad name.
+        swipe_double_tap: 'tap',
+        swipe_left: 'left',
+        swipe_right: 'right',
+        swipe_up: 'up',
+        swipe_down: 'down'
       };
-  while (b--) {
-    div.addEventListener(a[b], func, false);
-  }
-  div.addEventListener('touchstart', function (e) {
-    e.preventDefault();
+    
+  while(swipe_types --){
+    element_to_detect_swipe.addEventListener(
+        swipe_event_type[swipe_types],
+        swipe_action_to_element,
+        false)
+  };
+    
+    
+  element_to_detect_swipe.addEventListener('touchstart', function (event) {
+    event.preventDefault();
   }, false);
 }
 
-addAllListeners();
-})
 
+    
+    detect_swipe_events(document);
+    addAllListeners('div');
+
+    
+});
