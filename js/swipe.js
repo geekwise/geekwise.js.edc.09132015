@@ -10,8 +10,10 @@ function detect_swipe_events(element_to_detect) {
         element.target.dispatchEvent(a);
         a = null;
         return 1;
-      },
-      var mobile_browser_type = (/Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 'touch' : 'mouse')
+      };
+    
+    
+      var mobile_browser_type = (/Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 'touch' : 'mouse');
 
 
       var moved = false,
