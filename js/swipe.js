@@ -11,8 +11,10 @@ function detect_swipe_events(element_to_detect) {
         a = null;
         return 1;
       },
-      isMobile = (/Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 'touch' : 'mouse'),
-      moved = false,
+      var mobile_browser_type = (/Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 'touch' : 'mouse')
+
+
+      var moved = false,
       buttonDown = 0,
       pressedMoveThreshold = 20,
       startdt, endt,
@@ -89,8 +91,8 @@ function detect_swipe_events(element_to_detect) {
           }
         }
       };
-  for (var eventName in f[isMobile]) {
-    element_to_detect.addEventListener(eventName, f[isMobile][eventName], false);
+  for (var event_name in f[mobile_browser_type]) {
+    element_to_detect.addEventListener(event_name, f[mobile_browser_type][event_name], false);
   }
 };
 
